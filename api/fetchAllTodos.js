@@ -1,12 +1,17 @@
 const todoModel = require('../model/todoModel');
-const dbConnect = require('../config/dbConnect')
+const dbConnect = require('../config/dbConnect');
+
 export default async function handler(req, res) {
-    
-    await dbConnect()
-    
-    
-    const allTodos = await todoModel.find();
-    return res.status(200).json({
-        allTodos
-    })
+    await dbConnect();
+
+    try {
+        const allTodos = await todoModel.find();
+        return res.status(200).json({
+            allTodos
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: 'Failed to fetch todos'
+        });
+    }
 }
