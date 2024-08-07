@@ -29,3 +29,10 @@ Then run the app at the root of the repository:
 ```bash
 vercel dev
 ```
+
+
+
+  cloud_name: "df4prcuev",
+  api_key: "412985248428749",
+  api_secret: "x00qo_JQnpzYIwlmhGX8X_TuMNk",
+  secure: true,

@@ -1,44 +1,43 @@
-const cloudinary = require('cloudinary').v2;
-const formidable = require('formidable');
-const fs = require('fs');
-const dotenv = require('dotenv');
-
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+import streamifier from "streamifier";
 dotenv.config();
-
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const uploadMiddleware = upload.single("file");
 cloudinary.config({
   cloud_name: "df4prcuev",
   api_key: "412985248428749",
   api_secret: "x00qo_JQnpzYIwlmhGX8X_TuMNk",
+  secure: true,
 });
-
-export default async function handler(req, res) {
-    try {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        
-     
-      const form = new formidable.IncomingForm();
-    
-    //   form.parse(req, async (err, fields, files) => {
-    //     if (err) {
-    //       return res.status(500).json({ message: 'Error parsing the files' });
-    //     }
-    
-    //     const file = files.file;
-    
-        try {
-           
-          return res.status(200).json({
-            message: 'File uploaded successfully',
-            url: result.secure_url,
-          });
-        } catch (error) {
-          return res.status(500).json({ message: 'Failed to upload to Cloudinary', error });
-        }
-       
-    
-    } catch (error) {
-        console.log(error)
-    }
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
 }
+export default async function handler(req, res) {
+  await runMiddleware(req, res, uploadMiddleware);
+  console.log(req.file.buffer);
+  const stream = await cloudinary.uploader.upload_stream(
+    {
+      folder: "testFolder",
+    },
+    (error, result) => {
+      if (error) return console.error(error);
+      res.status(200).json(result);
+    }
+  );
+  streamifier.createReadStream(req.file.buffer).pipe(stream);
+}
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
