@@ -28,13 +28,13 @@ function runMiddleware(req, res, fn) {
 
 export default async function handler(req, res) {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Allow all methods
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS"); // Allow all methods
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type"); // Allow specific headers
 
   // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    return res.status(200).json({});
   }
 
   await runMiddleware(req, res, uploadMiddleware);
