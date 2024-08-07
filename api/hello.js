@@ -5,6 +5,6 @@ dotenv.config()
 
   return response.json({
     "message": "Hello world",
-    "url":process.env.DATABASE_URL
+    "url":"process.env.DATABASE_URL"
   })
 }
