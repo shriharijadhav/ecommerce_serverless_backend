@@ -39,7 +39,7 @@ export default async function handler(req, res) {
 
   await runMiddleware(req, res, uploadMiddleware);
 
-  const uploadPromises = req.files.map(file => {
+  const uploadPromises = req.files.map((file) => {
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: "testFolder" },
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     const urls = await Promise.all(uploadPromises);
     return res.status(200).json({ urls });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to upload images' });
+    return res.status(500).json({ error: "Failed to upload images" });
   }
 }
 
