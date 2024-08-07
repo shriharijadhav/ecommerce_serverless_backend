@@ -8,7 +8,7 @@ export default function handler(req, res)  {
 
   try {
     // await Todo.findByIdAndDelete(id);
-    return res.status(200).json({ message: 'Todo deleted successfully' });
+    return res.status(200).json({ message: 'Todo deleted successfully'+id });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to delete todo' });
   }
