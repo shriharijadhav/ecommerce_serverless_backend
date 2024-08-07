@@ -1,7 +1,7 @@
 // const connectToDatabase = require('../dbConnect');
 // const Todo = require('../models/Todo'); // Adjust the path as per your model location
 
-export default handler= async (req, res) => {
+export default function handler(request, response)  {
 //   await connectToDatabase();
 
   const { id } = req.query;
