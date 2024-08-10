@@ -41,23 +41,8 @@ export default async function handler(req, res) {
         }
 
         // hash the password before inserting data into the database
-        let hashedPassword=null;
-        bcrypt.hash(password, 10, function(err, hash) {
-            if(err) {
-                return res.status(500).json({
-                    message:'Failed to hash password',
-                    isSignupSuccess:false,
-                })
-            }
-            else{
-                return res.status(200).json({
-                    message:'Failed to hash password',
-                    isSignupSuccess:false,
-                    hash
-                })
-                hashedPassword = hash
-            }
-        });
+        const salt = bcrypt.genSaltSync(10);
+        const hashedPassword = bcrypt.hashSync(password, salt);
 
         const savedUser = await userModel.create({
             firstName:firstName,
