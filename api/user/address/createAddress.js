@@ -12,7 +12,7 @@ async function checkIfUserIsLoggedIn(accessToken) {
                 })
             }else{
                return res.status(200).json({
-                decoded
+                "decoded": decoded
                }) 
             }
           });
@@ -23,5 +23,5 @@ async function checkIfUserIsLoggedIn(accessToken) {
 
 export default async function handler(req,res){
     const {accessToken, refreshToken} = req.body
-    await checkIfUserIsLoggedIn(accessToken)
+    await checkIfUserIsLoggedIn(accessToken);
 }
