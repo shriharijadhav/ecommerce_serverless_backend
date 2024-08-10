@@ -37,7 +37,7 @@ export default async function logout(req, res) {
         const blacklistedToken = await blacklistedTokenModel.create({
             accessToken: accessToken,
             refreshToken: refreshToken,
-            userId: userId,
+            user: userId,
         });
 
         if (blacklistedToken) {
