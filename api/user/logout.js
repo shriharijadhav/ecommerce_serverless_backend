@@ -2,6 +2,7 @@ const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
 const blacklistedTokenModel = require('../../model/blacklistedToken')
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken')
 
 async function checkIfUserIsLoggedIn(req,accessToken,refreshToken, res) {
     try {
