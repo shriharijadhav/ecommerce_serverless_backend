@@ -5,8 +5,8 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
 
         // check if access token and refresh token are already blacklisted
         try {
-            const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-            const userId = decodedAccessToken.userId
+            const decodedRefreshTokenX = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+            const userId = decodedRefreshTokenX.userId
 
             const blacklistedToken = await blacklistedTokenModel.findOne({
                 user: userId,
