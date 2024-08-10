@@ -1,14 +1,25 @@
 const jwt = require('jsonwebtoken');
 
-async function checkIfUserIsLoggedIn(accessToken, res) {
+async function checkIfUserIsLoggedIn(req,accessToken,refreshToken, res) {
     try {
         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
             if (err) {
-                return res.status(200).json({
-                    message: 'Failed to verify access token',
-                    isAccessTokenExpired: true,
-                    regenerateAccessToken: true
+                
+                // check if refresh token is still valid (not expired)
+                jwt.verify(accessToken, process.env.REFRESH_TOKEN_SECRET, function(errRefreshToken, decodedRefreshToken) {
+                    if (errRefreshToken) {
+                        return res.status(200).json({
+                            "message": "Failed to verify access token",
+                            "isAccessTokenExpired": true,
+                            "regenerateAccessToken": true
+                        })
+                    } else {
+                        const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
+                        req.userId = decodedRefreshToken.userId;
+                        req.newAccessToken = newAccessToken
+                    }
                 });
+
             } else {
                 return res.status(200).json({
                     decoded: decoded
@@ -32,5 +43,12 @@ export default async function handler(req, res) {
         });
     }
 
-    await checkIfUserIsLoggedIn(accessToken, res);
+    await checkIfUserIsLoggedIn(req,accessToken,refreshToken,res);
+
+    const newAssessToken = req.newAccessToken
+    const userId = req.userId
+    return res.status(200).json({
+        newAssessToken,
+        userId
+    });
 }
