@@ -2,28 +2,32 @@ const jwt = require('jsonwebtoken');
 
 async function checkIfUserIsLoggedIn(req,accessToken,refreshToken, res) {
     try {
-        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
+        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, function(err, decodedAccessToken) {
             if (err) {
                 
                 // check if refresh token is still valid (not expired)
                 jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, function(errRefreshToken, decodedRefreshToken) {
                     if (errRefreshToken) {
                         return res.status(200).json({
-                            "message": "Failed to verify access token",
-                            "isAccessTokenExpired": true,
-                            "regenerateAccessToken": true
+                            "message": "Session time out. Refresh token expired",
+                            "isRefreshTokenExpired": true,
+                            "redirectUserToLogin": true
                         })
                     } else {
-                        const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
+                        // added user add on req
                         req.userId = decodedRefreshToken.userId;
+
+                        // re-generate new access token and add key on req
+                        const payload ={
+                            userId:decodedRefreshToken.userId
+                         }
+                        const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
                         req.newAccessToken = newAccessToken
                     }
                 });
 
             } else {
-                return res.status(200).json({
-                    decoded: decoded
-                });
+                req.userId = decodedAccessToken.userId;
             }
         });
     } catch (error) {
@@ -45,10 +49,11 @@ export default async function handler(req, res) {
 
     await checkIfUserIsLoggedIn(req,accessToken,refreshToken,res);
 
-    const newAssessToken = req.newAccessToken
+
+    const newAccessToken = req.newAccessToken
     const userId = req.userId
     return res.status(200).json({
-        newAssessToken,
+        newAccessToken,
         userId
     });
 }
