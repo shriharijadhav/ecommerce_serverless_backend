@@ -1,28 +1,33 @@
 const jwt = require('jsonwebtoken');
-const blacklistedTokenModel = require('../model/blacklistedToken')
-const mongoose = require('mongoose')
+const blacklistedTokenModel = require('../model/blacklistedToken');
+const mongoose = require('mongoose');
 
 async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
+        // Log the start time
+        console.time('checkIfUserIsLoggedIn');
 
-        // check if access token and refresh token are already blacklisted
-         // Validate the refresh token first
-         const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-         const userId_temp = new mongoose.Types.ObjectId(decodedRefreshToken_demo.userId);
+        // Check if the refresh token is valid first
+        const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const userId_temp = new mongoose.Types.ObjectId(decodedRefreshToken_demo.userId);
 
- 
-         const blacklistedToken = await blacklistedTokenModel.findOne({
-            user: userId_temp, // Ensure req.userId is a valid ObjectId
+        // Check if the tokens are blacklisted
+        const blacklistedToken = await blacklistedTokenModel.findOne({
+            user: userId_temp, 
             accessToken: accessToken,
             refreshToken: refreshToken
         });
-        
+
         if (blacklistedToken) {
+            console.timeEnd('checkIfUserIsLoggedIn');
             return false; // Tokens are blacklisted
         }
 
+        // Verify the access token
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         req.userId = decodedAccessToken.userId;
+
+        console.timeEnd('checkIfUserIsLoggedIn');
         return true; // Access token is valid
 
     } catch (err) {
@@ -31,20 +36,18 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
                 const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
                 req.userId = decodedRefreshToken.userId;
 
-                // re-generate new access token and add key on req
-                const payload ={
-                    userId:decodedRefreshToken.userId
-                 }
+                // Re-generate new access token
+                const payload = { userId: decodedRefreshToken.userId };
                 const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
-                req.newAccessToken = newAccessToken
+                req.newAccessToken = newAccessToken;
+
                 return true; // Refresh token is valid
 
             } catch (errRefreshToken) {
-                // Refresh token is also invalid or expired
-                return false;
+                return false; // Refresh token is invalid or expired
             }
         }
-        return false
+        return false; // Access and refresh tokens are both invalid
     }
 }
 
