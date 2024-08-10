@@ -26,6 +26,7 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         req.userId = decodedAccessToken.userId;
         return true; // Access token is valid
+        
     } catch (err) {
         if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
             try {
