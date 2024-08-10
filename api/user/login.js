@@ -1,6 +1,8 @@
 const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 
 export default async function login(req, res) {
     // Set CORS headers
@@ -45,14 +47,21 @@ export default async function login(req, res) {
             })
         }
 
+        const payload ={
+            ...userFromDB,
+            password:null
+        }
+
+        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
+
         return res.status(200).json({
             message:'login successful',
-            isLoginSuccessful:true
+            isLoginSuccessful:true,
+            accessToken,
+            refreshToken
         })
-                
-        
-
-
+     
     } catch (error) {
         return res.status(200).json({
             error: 'Failed to login ',
