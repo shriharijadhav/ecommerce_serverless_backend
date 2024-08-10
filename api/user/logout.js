@@ -1,56 +1,42 @@
-const userModel = require('../../model/userModel')
-const dbConnect = require('../../config/dbConnect');
-const blacklistedTokenModel = require('../../model/blacklistedToken')
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken')
+const blacklistedTokenModel = require('../../model/blacklistedToken');
+const dbConnect = require('../../config/dbConnect');
 
-async function checkIfUserIsLoggedIn(req,accessToken,refreshToken, res) {
+function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
+        const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+        req.userId = decodedAccessToken.userId;
+        return true; // Access token is valid
+    } catch (err) {
+        if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
+            try {
+                const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+                req.userId = decodedRefreshToken.userId;
 
-        
-
-
-        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, function(err, decodedAccessToken) {
-            if (err) {
+                // re-generate new access token and add key on req
+                const payload ={
+                    userId:decodedRefreshToken.userId
+                 }
+                const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
+                req.newAccessToken = newAccessToken
+                return true; // Refresh token is valid
                 
-                // check if refresh token is still valid (not expired)
-                jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, function(errRefreshToken, decodedRefreshToken) {
-                    if (errRefreshToken) {
-                        return res.status(200).json({
-                            message: "Session time out. Refresh token expired",
-                            isRefreshTokenExpired: true,
-                            isUserLoggedOut: true,
-                            redirectUserToLogin: true
-                        })
-                    } else {
-                        // added user add on req
-                        req.userId = decodedRefreshToken.userId;
-
-                        // in case of logout we do not want to regenerate the new access token
-                    }
-                });
-
-            } else {
-                req.userId = decodedAccessToken.userId;
-                
+            } catch (errRefreshToken) {
+                // Refresh token is also invalid or expired
+                return false;
             }
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Internal Server Error',
-            error: error.message
-        });
+        }
+        throw new Error('Invalid token');
     }
 }
 
-
-export default async function login(req, res) {
+export default async function logout(req, res) {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Allow all methods
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Handle preflight requests
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -58,34 +44,38 @@ export default async function login(req, res) {
     await dbConnect();
 
     try {
-        const {accessToken, refreshToken} = req.body;
-        await checkIfUserIsLoggedIn(req,accessToken,refreshToken,res);
-        
+        const { accessToken, refreshToken } = req.body;
+        const isLoggedIn = checkIfUserIsLoggedIn(req, accessToken, refreshToken);
+
+        if (!isLoggedIn) {
+            return res.status(200).json({
+                message: "Session timeout. Refresh token expired",
+                isRefreshTokenExpired: true,
+                isUserLoggedOut: true,
+                redirectUserToLogin: true,
+            });
+        }
 
         const userId = mongoose.Types.ObjectId(req.userId);
 
         const blacklistedToken = await blacklistedTokenModel.create({
             accessToken: accessToken,
             refreshToken: refreshToken,
-            userId: userId
-        })
+            userId: userId,
+        });
 
-
-        if(blacklistedToken){
+        if (blacklistedToken) {
             return res.status(200).json({
                 message: 'User logged out successfully',
                 isUserLoggedOut: true,
                 redirectUserToLogin: true,
-
-            })
+            });
         }
 
-
-
-
     } catch (error) {
-        return res.status(200).json({
-            error: 'Failed to login ',
+        return res.status(500).json({
+            error: 'Failed to logout',
+            details: error.message,
         });
     }
 }
