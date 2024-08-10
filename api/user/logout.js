@@ -21,7 +21,7 @@ function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
                 const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
                 req.newAccessToken = newAccessToken
                 return true; // Refresh token is valid
-                
+
             } catch (errRefreshToken) {
                 // Refresh token is also invalid or expired
                 return false;
@@ -56,7 +56,7 @@ export default async function logout(req, res) {
             });
         }
 
-        const userId = mongoose.Types.ObjectId(req.userId);
+        const userId = new mongoose.Types.ObjectId(req.userId);
 
         const blacklistedToken = await blacklistedTokenModel.create({
             accessToken: accessToken,
