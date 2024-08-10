@@ -1,7 +1,30 @@
 const jwt = require('jsonwebtoken');
-
-function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
+const blacklistedTokenModel = require('../model/blacklistedToken')
+async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
+
+        // check if access token and refresh token are already blacklisted
+        try {
+            const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+            const userId = decodedAccessToken.userId
+
+            const blacklistedToken = await blacklistedTokenModel.findOne({
+                user: userId,
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            })
+
+            if(blacklistedToken){
+                return false;
+            }
+           
+
+        } catch (errRefreshToken) {
+            
+            return false;
+        }
+
+
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         req.userId = decodedAccessToken.userId;
         return true; // Access token is valid
