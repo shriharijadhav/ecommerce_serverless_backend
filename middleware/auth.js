@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
