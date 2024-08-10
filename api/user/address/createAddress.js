@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         });
     }
 
-    const isLoggedIn = checkIfUserIsLoggedIn(req, accessToken, refreshToken);
+    const isLoggedIn = await checkIfUserIsLoggedIn(req, accessToken, refreshToken);
 
         if (!isLoggedIn) {
             return res.status(200).json({

@@ -21,7 +21,7 @@ export default async function logout(req, res) {
 
     try {
         const { accessToken, refreshToken } = req.body;
-        const isLoggedIn = checkIfUserIsLoggedIn(req, accessToken, refreshToken);
+        const isLoggedIn = await checkIfUserIsLoggedIn(req, accessToken, refreshToken);
 
         if (!isLoggedIn) {
             return res.status(200).json({
