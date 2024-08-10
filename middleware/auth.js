@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 const blacklistedTokenModel = require('../model/blacklistedToken');
 const mongoose = require('mongoose');
+const dbConnect = require('../config/dbConnect')
 
 async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
         // Log the start time
-        console.time('checkIfUserIsLoggedIn');
+        await dbConnect();
 
         const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         const userId_temp = new mongoose.Types.ObjectId(decodedRefreshToken_demo.userId);
