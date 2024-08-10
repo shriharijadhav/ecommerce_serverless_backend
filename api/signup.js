@@ -3,7 +3,7 @@ const dbConnect = require('../config/dbConnect');
 const bcrypt = require('bcrypt');
 
 
-export default async function signup(req, res) {
+export default async function handler(req, res) {
     
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
