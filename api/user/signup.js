@@ -1,5 +1,5 @@
-const userModel = require('../model/userModel');
-const dbConnect = require('../config/dbConnect');
+const userModel = require('../../model/userModel');
+const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
 
 
