@@ -6,7 +6,7 @@ async function checkIfUserIsLoggedIn(req,accessToken,refreshToken, res) {
             if (err) {
                 
                 // check if refresh token is still valid (not expired)
-                jwt.verify(accessToken, process.env.REFRESH_TOKEN_SECRET, function(errRefreshToken, decodedRefreshToken) {
+                jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, function(errRefreshToken, decodedRefreshToken) {
                     if (errRefreshToken) {
                         return res.status(200).json({
                             "message": "Failed to verify access token",
