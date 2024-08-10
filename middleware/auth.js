@@ -10,23 +10,20 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
          const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
          req.userId = decodedRefreshToken_demo.userId;
  
-         // Check if the tokens are blacklisted
          const blacklistedToken = await blacklistedTokenModel.findOne({
-             user: new mongoose.Types.ObjectId(req.userId),
-             accessToken,
-             refreshToken
-         });
- 
-         if (blacklistedToken) {
-             return false; // Tokens are blacklisted
-         }
- 
-
+            user: mongoose.Types.ObjectId(req.userId), // Ensure req.userId is a valid ObjectId
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        });
+        
+        if (blacklistedToken) {
+            return false; // Tokens are blacklisted
+        }
 
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         req.userId = decodedAccessToken.userId;
         return true; // Access token is valid
-        
+
     } catch (err) {
         if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
             try {
