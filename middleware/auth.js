@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
 const blacklistedTokenModel = require('../model/blacklistedToken')
+const mongoose = require('mongoose')
+
 async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
 
         // check if access token and refresh token are already blacklisted
         try {
             const decodedRefreshTokenX = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-            const userId = decodedRefreshTokenX.userId
+            const userId = new mongoose.Types.ObjectId(decodedRefreshTokenX?.userId)
 
             const blacklistedToken = await blacklistedTokenModel.findOne({
                 user: userId,
