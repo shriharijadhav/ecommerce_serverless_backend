@@ -7,17 +7,17 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
         // Log the start time
         console.time('checkIfUserIsLoggedIn');
 
-        // Check if the refresh token is valid first
         const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         const userId_temp = new mongoose.Types.ObjectId(decodedRefreshToken_demo.userId);
 
-        if(decodedRefreshToken_demo){
-                // Check if the tokens are blacklisted
+        if (decodedRefreshToken_demo) {
+            // Check if the tokens are blacklisted
             const blacklistedToken = await blacklistedTokenModel.findOne({
-                user: userId_temp, 
+                user: userId_temp,
                 accessToken: accessToken,
                 refreshToken: refreshToken
             });
+
 
             if (blacklistedToken) {
                 
