@@ -48,7 +48,9 @@ export default async function handler(req, res) {
             newAccessToken: req.newAccessToken ? req.newAccessToken : null,
             message: 'Either productFromRequest, user id or cart is missing in request.',
             isProductAddedToCart: false,
-            completeUserDetails: req?.completeUserDetails ? req?.completeUserDetails : null
+            cartId:cartId,
+            productFromRequest,
+            userId
         });
     }
 
