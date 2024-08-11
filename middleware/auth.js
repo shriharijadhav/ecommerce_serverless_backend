@@ -21,7 +21,12 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
         }else{
             const userAddresses = await addressModel.find({ user: userFromDB._id})
             const userCart = await cartModel.findOne({ user: userFromDB._id})
-            const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
+            const userProfileInfo = {
+                firstName:userFoundInDB.firstName,
+                lastName:userFoundInDB.lastName,
+                email:userFoundInDB.email,
+                contact:userFoundInDB.contact,
+                userId:userFoundInDB._id}
             const userData = {
                 userProfileInfo,
                 userAddresses,
