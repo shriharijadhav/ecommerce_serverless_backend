@@ -55,6 +55,7 @@ export default async function handler(req, res) {
         }
 
         // Fetch products with pagination and filters
+        const totalProductsPerCategory = await productModel.find({gender: gender, category: category});
         const products = await productModel.find({gender: gender, category: category})
             .skip(skip)
             .limit(limit);
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
             message: 'Products fetched successfully',
             page,
+            totalProductsPerCategory,
             totalPages: Math.ceil(totalProducts / limit),
             products,
         });
