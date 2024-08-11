@@ -1,7 +1,7 @@
 import checkIfUserIsLoggedIn from '../../middleware/auth';
 
 const dbConnect = require('../../config/dbConnect');
-const productModel = require('../../../model/productModel');
+const productModel = require('../../model/productModel');
 
 export default async function handler(req, res) {
     // Set CORS headers
