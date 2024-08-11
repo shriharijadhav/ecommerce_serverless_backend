@@ -1,20 +1,36 @@
 import checkIfUserIsLoggedIn from '../../../middleware/auth';
+const dbConnect = require('../../../config/dbConnect')
 
 const jwt = require('jsonwebtoken');
 
 
 export default async function handler(req, res) {
-    const { accessToken, refreshToken } = req.body;
 
-    if (!accessToken) {
-        return res.status(400).json({
-            message: 'Access token is required'
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Allow all methods
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, access-token, refresh-token'); // Allow specific headers
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    // make db connection
+    await dbConnect();
+
+
+    const accessToken = req.headers['access-token'];
+    const refreshToken = req.headers['refresh-token'];
+
+    if (!accessToken || !refreshToken) {
+        return res.status(200).json({
+            message: 'Tokens missing',
+            redirectUserToLogin: true,
         });
     }
 
     const isLoggedIn = await checkIfUserIsLoggedIn(req, accessToken, refreshToken);
-
-        if (!isLoggedIn) {
+    if (!isLoggedIn) {
             return res.status(200).json({
                 message: "Session timeout. Refresh token expired",
                 isRefreshTokenExpired: true,
@@ -22,15 +38,16 @@ export default async function handler(req, res) {
             });
     }
 
+    // logic for creating address starts here
+    const {houseAddress,street,city,state,postalCode,country,phoneNumber} = req.body;
 
+     
 
-    let isNewAccessTokenGenerated = false;
-    if(req.newAccessToken){
-        isNewAccessTokenGenerated=true;
-    }
-    const userId = req.userId
+    // logic for creating address ends here   
+    
+    
     return res.status(200).json({
-        newAccessToken:isNewAccessTokenGenerated? req.newAccessToken : null,
-        userId
+        newAccessToken:req.newAccessToken ? req.newAccessToken : null,
+        houseAddress,street,city,state,postalCode,country,phoneNumber,userId
     });
 }

@@ -5,10 +5,12 @@ const jwt = require('jsonwebtoken');
 
 
 export default async function login(req, res) {
+  
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Allow all methods
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, access-token, refresh-token'); // Allow specific headers
+
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
