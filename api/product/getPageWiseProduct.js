@@ -68,7 +68,7 @@ export default async function handler(req, res) {
             gender,
             category,
             totalProductCountPerCategory:totalProducts?.length ? totalProducts?.length : 0,
-            totalPages: Math.ceil(totalProducts / limit),
+            totalPages: Math.ceil((totalProducts?.length) / limit),
             products,
         });
     } catch (error) {
