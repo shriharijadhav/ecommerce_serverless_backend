@@ -27,6 +27,8 @@ export default async function handler(req, res) {
         return res.status(200).json({
             message: 'Tokens missing',
             redirectUserToLogin: true,
+            isAddressSaved:false
+
         });
     }
 
@@ -36,6 +38,8 @@ export default async function handler(req, res) {
                 message: "Session timeout. Refresh token expired",
                 isRefreshTokenExpired: true,
                 redirectUserToLogin: true,
+                isAddressSaved:false
+
             });
     }
 
@@ -45,7 +49,8 @@ export default async function handler(req, res) {
     if(!houseAddress || !street || !city || !state || !postalCode || !country || !phoneNumber) {
         return res.status(200).json({
             newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-            message:'Some of the fields are missing'
+            message:'Some of the fields are missing',
+            isAddressSaved:false
         });
     }
 
@@ -70,5 +75,8 @@ export default async function handler(req, res) {
         newAccessToken:req.newAccessToken ? req.newAccessToken : null,
         message:savedAddress?'Address saved successfully':'Failed to save address. Please try again.',
         savedAddress,
+        isAddressSaved:true,
+        completeUserDetails:req?.completeUserDetails ? req?.completeUserDetails : null
+
     });
 }

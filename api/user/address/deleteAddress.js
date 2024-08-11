@@ -27,6 +27,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
             message: 'Tokens missing',
             redirectUserToLogin: true,
+            isAddressDeleted:false
         });
     }
 
@@ -36,20 +37,20 @@ export default async function handler(req, res) {
                 message: "Session timeout. Refresh token expired",
                 isRefreshTokenExpired: true,
                 redirectUserToLogin: true,
+                isAddressDeleted:false
             });
     }
 
     // logic for deleting address starts here
     const {addressId} = req.body;
-
-    if(!addressId) {
+    let userId = req?.userId;
+    if(!addressId || !userId) {
         return res.status(200).json({
             newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-            message:'Address is required.'
+            message:'Failed to delete Address.Address ID and User ID is required to delete a address.',
+            isAddressDeleted:false
         });
     }
-
-    let userId = req?.userId;
 
     const deletedAddress = await addressModel.deleteOne({ _id: addressId, user: userId });
    
@@ -60,5 +61,6 @@ export default async function handler(req, res) {
     return res.status(200).json({
         newAccessToken:req.newAccessToken ? req.newAccessToken : null,
         message:deletedAddress?'Address deleted successfully':'failed to delete the address with id'+addressId,
+        isAddressDeleted:true
     });
 }

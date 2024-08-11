@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const blacklistedTokenModel = require('../model/blacklistedToken');
 const mongoose = require('mongoose');
-const dbConnect = require('../config/dbConnect')
+const dbConnect = require('../config/dbConnect');
+const userModel = require('../model/userModel');
 
 async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
@@ -10,6 +11,15 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
 
         const decodedRefreshToken_demo = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         const userId_temp = decodedRefreshToken_demo?.userId;
+
+        // check if user with id exists in database or not
+        let userFoundInDB = await userModel.findOne({_id: userId_temp})
+        if (!userFoundInDB) {
+            return false
+        }else{
+            userFoundInDB.password = null;
+            req.completeUserDetails = userFoundInDB
+        }
 
         if (decodedRefreshToken_demo) {
             // Check if the tokens are blacklisted
