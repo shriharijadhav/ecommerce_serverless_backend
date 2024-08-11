@@ -68,21 +68,24 @@ export default async function handler(req, res) {
         (product) => product._id.toString() === productFromRequest._id.toString()
     );
     
-    if (!existingProduct) {
+    let updatedCart;
+    if (existingProduct.length === 0) {
         // Case 1: Product is added to cart for the first time
         let newProduct = {
             ...productFromRequest,
             quantity: 1,
         };
-        await cartModel.updateOne(
+        updatedCart = await cartModel.updateOne(
             { user: userId },
-            { $push: { allProductsInCart: newProduct } }
+            { $push: { allProductsInCart: newProduct } },
+            {new:true }
         );
     } else {
         // Case 2: Product already exists in the cart, increase quantity by 1
-        await cartModel.updateOne(
+        updatedCart =await cartModel.updateOne(
             { user: userId, 'allProductsInCart._id': existingProduct._id },
-            { $inc: { 'allProductsInCart.$.quantity': 1 } }
+            { $inc: { 'allProductsInCart.$.quantity': 1 } },
+            {new:true }
         );
     }
     
@@ -91,6 +94,6 @@ export default async function handler(req, res) {
         message: 'Product added to cart successfully.',
         isProductAddedToCart: true,
         existingProduct,
-        cart: cart ? cart : [],
+        updatedCart: cart ? cart : [],
     });
 }
