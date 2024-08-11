@@ -55,9 +55,7 @@ export default async function handler(req, res) {
         }
 
         // Fetch products with pagination and filters
-        const products = await productModel.find(query)
-            .skip(skip)
-            .limit(limit);
+        const products = await productModel.find( );
 
         // Get total count for pagination purposes
         const totalProducts = await productModel.countDocuments(query);
