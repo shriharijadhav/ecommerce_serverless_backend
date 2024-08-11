@@ -1,3 +1,5 @@
+import addressModel from '../../model/addressModel';
+
 const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
@@ -57,9 +59,19 @@ export default async function login(req, res) {
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1h' });
 
+
+        // fetch all the data of user from multiple collections and send in response
+        const userAddresses = await addressModel.find({ userId: userFromDB._id})
+        const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
+        const userData = {
+            userProfileInfo,
+            userAddresses
+        }
+
         return res.status(200).json({
             message:'login successful',
             isLoginSuccessful:true,
+            userData,
             accessToken,
             refreshToken
         })
