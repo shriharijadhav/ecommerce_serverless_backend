@@ -1,3 +1,5 @@
+import cartModel from '../../model/cartModel';
+
 const userModel = require('../../model/userModel');
 const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
@@ -53,7 +55,9 @@ export default async function handler(req, res) {
             
         })
 
-        if(!savedUser){
+        const cartCreated = await cartModel.create({user:savedUser._id})
+
+        if(!savedUser || ! cartCreated){
             return res.status(500).json({
                 message:'Failed to register user. please try again',
                 isSignupSuccess:false,
