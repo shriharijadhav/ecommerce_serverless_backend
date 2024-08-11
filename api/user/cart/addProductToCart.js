@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     );
     
     let updatedCart;
-    if (existingProduct.length === 0) {
+    if (!existingProduct) {  // Changed condition to check if existingProduct is undefined
         // Case 1: Product is added to cart for the first time
         let newProduct = {
             ...productFromRequest,
@@ -78,14 +78,14 @@ export default async function handler(req, res) {
         updatedCart = await cartModel.updateOne(
             { user: userId },
             { $push: { allProductsInCart: newProduct } },
-            {new:true }
+            { new: true }
         );
     } else {
         // Case 2: Product already exists in the cart, increase quantity by 1
-        updatedCart =await cartModel.updateOne(
+        updatedCart = await cartModel.updateOne(
             { user: userId, 'allProductsInCart._id': existingProduct._id },
             { $inc: { 'allProductsInCart.$.quantity': 1 } },
-            {new:true }
+            { new: true }
         );
     }
     
@@ -93,6 +93,6 @@ export default async function handler(req, res) {
         newAccessToken: req.newAccessToken ? req.newAccessToken : null,
         message: 'Product added to cart successfully.',
         isProductAddedToCart: true,
-        updatedCart: cart ? cart : [],
+        updatedCart: updatedCart ? updatedCart : [],
     });
 }
