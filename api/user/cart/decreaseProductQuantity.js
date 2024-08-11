@@ -39,10 +39,10 @@ export default async function handler(req, res) {
         });
     }
 
-    const { productDetails } = req.body;
+    const { productId } = req.body;
     const userId = req?.userId;
 
-    if (!productDetails || !userId) {
+    if (!productId || !userId) {
         return res.status(400).json({
             newAccessToken: req.newAccessToken ? req.newAccessToken : null,
             message: 'Product details or user ID missing in request.',
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
     }
 
     let existingProduct = cart?.allProductsInCart?.find(
-        (product) => product._id.toString() === productDetails._id.toString()
+        (product) => product._id.toString() === productId.toString()
     );
 
     if (!existingProduct) {
