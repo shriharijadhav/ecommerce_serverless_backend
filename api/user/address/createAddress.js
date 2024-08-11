@@ -1,4 +1,5 @@
 import checkIfUserIsLoggedIn from '../../../middleware/auth';
+import addressModel from '../../../model/addressModel';
 const dbConnect = require('../../../config/dbConnect')
 
 const jwt = require('jsonwebtoken');
@@ -47,6 +48,19 @@ export default async function handler(req, res) {
             message:'Some of the fields are missing'
         });
     }
+
+    const allAddresses = await addressModel.find();
+
+
+    let savedAddress;
+    let userId = new mongoose.Types.ObjectId(req,userId);
+    // check if at least one address has been added already - if not, create a new one and set isDefault property to true
+    if(allAddresses.length===0) {
+        savedAddress = await addressModel.create({houseAddress,street,city,state,postalCode,country,phoneNumber,isDefault:true,user:userId})
+    }else{
+        savedAddress = await addressModel.create({houseAddress,street,city,state,postalCode,country,phoneNumber,user:userId})
+    }
+
      
 
     // logic for creating address ends here   
@@ -54,7 +68,8 @@ export default async function handler(req, res) {
     
     return res.status(200).json({
         newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-        houseAddress,street,city,state,postalCode,country,phoneNumber,
+        savedAddress,
         userId:req?.userId
+
     });
 }
