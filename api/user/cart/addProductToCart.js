@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // make db connection
+    // Make db connection
     await dbConnect();
 
     const accessToken = req.headers['access-token'];
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         });
     }
 
-    // logic for adding product to cart starts here
+    // Logic for adding product to cart starts here
     const { productFromRequest } = req.body;
     const userId = req?.userId;
     const cartId = req?.completeUserDetails?.userCart?._id;
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
             newAccessToken: req.newAccessToken ? req.newAccessToken : null,
             message: 'Either productFromRequest, user id or cart is missing in request.',
             isProductAddedToCart: false,
-            cartId:cartId,
+            cartId,
             productFromRequest,
             userId
         });
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
     // Check if the product already exists in the cart
     let existingProduct = cart?.allProductsInCart?.find(
-        (product) => product.productId === Number(productFromRequest.productId[`$numberInt`])
+        (product) => product._id.toString() === productFromRequest._id.toString()
     );
     
     if (!existingProduct) {
@@ -81,12 +81,11 @@ export default async function handler(req, res) {
     } else {
         // Case 2: Product already exists in the cart, increase quantity by 1
         await cartModel.updateOne(
-            { user: userId, 'allProductsInCart.productId': Number(existingProduct.productId[`$numberInt`]) },
+            { user: userId, 'allProductsInCart._id': existingProduct._id },
             { $inc: { 'allProductsInCart.$.quantity': 1 } }
         );
     }
     
-
     return res.status(200).json({
         newAccessToken: req.newAccessToken ? req.newAccessToken : null,
         message: 'Product added to cart successfully.',
