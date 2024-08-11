@@ -65,9 +65,9 @@ export default async function handler(req, res) {
 
     // Check if the product already exists in the cart
     let existingProduct = cart?.allProductsInCart?.find(
-        (product) => product.productId === Number(productFromRequest?.productId)
+        (product) => product.productId === Number(productFromRequest.productId[`$numberInt`])
     );
-
+    
     if (!existingProduct) {
         // Case 1: Product is added to cart for the first time
         let newProduct = {
@@ -81,10 +81,11 @@ export default async function handler(req, res) {
     } else {
         // Case 2: Product already exists in the cart, increase quantity by 1
         await cartModel.updateOne(
-            { user: userId, 'allProductsInCart.productId': Number(existingProduct.productId) },
+            { user: userId, 'allProductsInCart.productId': Number(existingProduct.productId[`$numberInt`]) },
             { $inc: { 'allProductsInCart.$.quantity': 1 } }
         );
     }
+    
 
     return res.status(200).json({
         newAccessToken: req.newAccessToken ? req.newAccessToken : null,
