@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         });
     }
 
-    let userId = new mongoose.Types.ObjectId(req.userId);
+    let userId = req?.userId;
 
     const deletedAddress = await addressModel.deleteOne({ _id: addressId, user: userId });
    

@@ -32,7 +32,7 @@ export default async function logout(req, res) {
             });
         }
 
-        const userId = new mongoose.Types.ObjectId(req.userId);
+        const userId = req?.userId;
 
         const blacklistedToken = await blacklistedTokenModel.create({
             accessToken: accessToken,
