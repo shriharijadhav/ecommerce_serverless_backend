@@ -1,7 +1,7 @@
 import checkIfUserIsLoggedIn from '../../../middleware/auth';
 import addressModel from '../../../model/addressModel';
 const dbConnect = require('../../../config/dbConnect')
-
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 
