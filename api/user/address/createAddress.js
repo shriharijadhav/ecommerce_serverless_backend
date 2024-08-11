@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         });
     }
 
-    let userId = new mongoose.Types.ObjectId(req.userId);
+    let userId = req?.userId;
 
     const allAddresses = await addressModel.find({user:userId});
 
