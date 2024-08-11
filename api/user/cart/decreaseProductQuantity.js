@@ -90,6 +90,5 @@ export default async function handler(req, res) {
         newAccessToken: req.newAccessToken ? req.newAccessToken : null,
         message: 'Product quantity decreased successfully.',
         isProductQuantityDecreased: true,
-        updatedCart,
     });
 }
