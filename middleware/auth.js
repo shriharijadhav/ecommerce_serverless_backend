@@ -3,6 +3,8 @@ const blacklistedTokenModel = require('../model/blacklistedToken');
 const mongoose = require('mongoose');
 const dbConnect = require('../config/dbConnect');
 const userModel = require('../model/userModel');
+const addressModel = require('../model/addressModel');
+const cartModel = require('../model/cartModel');
 
 async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
     try {
@@ -13,12 +15,19 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
         const userId_temp = decodedRefreshToken_demo?.userId;
 
         // check if user with id exists in database or not
-        let userFoundInDB = await userModel.findOne({_id: userId_temp})
+        let userFoundInDB = await userModel.findOne({_id: userId_temp});
         if (!userFoundInDB) {
             return false
         }else{
-            userFoundInDB.password = null;
-            req.completeUserDetails = userFoundInDB
+            const userAddresses = await addressModel.find({ user: userFromDB._id})
+            const userCart = await cartModel.findOne({ user: userFromDB._id})
+            const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
+            const userData = {
+                userProfileInfo,
+                userAddresses,
+                userCart
+            }
+            req.completeUserDetails = userData
         }
 
         if (decodedRefreshToken_demo) {
