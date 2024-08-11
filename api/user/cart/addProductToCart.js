@@ -93,6 +93,6 @@ export default async function handler(req, res) {
         newAccessToken: req.newAccessToken ? req.newAccessToken : null,
         message: 'Product added to cart successfully.',
         isProductAddedToCart: true,
-        updatedCart: updatedCart ? updatedCart : [],
+        updatedCart: cart ? cart : [],
     });
 }
