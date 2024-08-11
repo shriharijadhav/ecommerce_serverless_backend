@@ -39,36 +39,26 @@ export default async function handler(req, res) {
             });
     }
 
-    // logic for creating address starts here
-    const {houseAddress,street,city,state,postalCode,country,phoneNumber} = req.body;
+    // logic for deleting address starts here
+    const {addressId} = req.body;
 
-    if(!houseAddress || !street || !city || !state || !postalCode || !country || !phoneNumber) {
+    if(!addressId) {
         return res.status(200).json({
             newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-            message:'Some of the fields are missing'
+            message:'Address is required.'
         });
     }
 
     let userId = new mongoose.Types.ObjectId(req.userId);
 
-    const allAddresses = await addressModel.find({user:userId});
+    const deletedAddress = await addressModel.deleteOne({ _id: addressId, user: userId });
+   
 
-    let savedAddress;
-    // check if at least one address has been added already - if not, create a new one and set isDefault property to true
-    if(allAddresses.length===0) {
-        savedAddress = await addressModel.create({houseAddress,street,city,state,postalCode,country,phoneNumber,isDefault:true,user:userId})
-    }else{
-        savedAddress = await addressModel.create({houseAddress,street,city,state,postalCode,country,phoneNumber,user:userId})
-    }
-
-     
-
-    // logic for creating address ends here   
+    // logic for deleting address ends here   
     
     
     return res.status(200).json({
         newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-        message:savedAddress?'Address saved successfully':'Failed to save address. Please try again.',
-        savedAddress,
+        message:deletedAddress?'Address deleted successfully':'failed to delete the address with id'+addressId,
     });
 }
