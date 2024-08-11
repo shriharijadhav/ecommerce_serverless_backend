@@ -60,12 +60,14 @@ export default async function handler(req, res) {
             .limit(limit);
 
         // Get total count for pagination purposes
-        const totalProducts = await productModel.countDocuments(query);
+        const totalProducts = await productModel.find({gender: gender, category: category});
 
         return res.status(200).json({
             message: 'Products fetched successfully',
             page,
-            totalProductCountPerCategory:totalProducts? totalProducts?.length : 0,
+            gender,
+            category,
+            totalProductCountPerCategory:totalProducts? totalProducts.length : 0,
             totalPages: Math.ceil(totalProducts / limit),
             products,
         });
