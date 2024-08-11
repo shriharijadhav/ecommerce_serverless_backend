@@ -41,6 +41,12 @@ export default async function handler(req, res) {
     // logic for creating address starts here
     const {houseAddress,street,city,state,postalCode,country,phoneNumber} = req.body;
 
+    if(!houseAddress || !street || !city || !state || !postalCode || !country || !phoneNumber) {
+        return res.status(200).json({
+            newAccessToken:req.newAccessToken ? req.newAccessToken : null,
+            message:'Some of the fields are missing'
+        });
+    }
      
 
     // logic for creating address ends here   
@@ -48,6 +54,7 @@ export default async function handler(req, res) {
     
     return res.status(200).json({
         newAccessToken:req.newAccessToken ? req.newAccessToken : null,
-        houseAddress,street,city,state,postalCode,country,phoneNumber,userId
+        houseAddress,street,city,state,postalCode,country,phoneNumber,
+        userId:req?.userId
     });
 }
