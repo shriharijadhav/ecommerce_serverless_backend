@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             message: 'Product fetched successfully',
-            singleProductFetchSuccessful: false,
+            singleProductFetchSuccessful: true,
             product,
         });
     } catch (error) {
