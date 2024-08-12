@@ -3,7 +3,7 @@ import checkIfUserIsLoggedIn from '../../middleware/auth';
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
 const cartModel = require('../../model/cartModel');
-
+ 
 export default async function handler(req, res) {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
