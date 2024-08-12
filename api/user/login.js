@@ -1,5 +1,5 @@
-import addressModel from '../../model/addressModel';
-import cartModel from '../../model/cartModel';
+const addressModel = require('../../model/addressModel')
+const cartModel = require('../../model/cartModel');
 const placedOrderModel = require('../../model/placedOrderModel');
 
 const userModel = require('../../model/userModel')
@@ -65,10 +65,7 @@ export default async function login(req, res) {
         // fetch all the data of user from multiple collections and send in response
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
-        const ordersPlaced = await placedOrderModel.findOne({ user: userId })
-            .populate('product')     // Ensure 'products' is the correct reference
-            .populate('address')   // Ensure 'address_id' is the correct reference
-            .exec();
+        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate('product').exec();
 
 
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
