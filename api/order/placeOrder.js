@@ -49,6 +49,8 @@ export default async function handler(req, res) {
             return res.status(400).json({
                 message: 'Your cart is empty. Please add items to your cart before placing an order.',
                 isOrderPlacedSuccessfully: false,
+                userId,
+                cart
             });
         }
 
