@@ -88,8 +88,8 @@ export default async function handler(req, res) {
 
         const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate({
             path: 'products',
-            model: productModel,
         }).exec();
+        
         
         return res.status(201).json({
             message: 'Order placed successfully',

@@ -64,4 +64,5 @@ const productSchema = new mongoose.Schema({
     preferredDeliveryTag: { type: String, default: "" },
 });
 
-module.exports = mongoose.model('product', productSchema);
+const productModel =  mongoose.model('product', productSchema);
+module.exports = productModel
