@@ -1,15 +1,14 @@
 import checkIfUserIsLoggedIn from '../../middleware/auth';
-const productModel = require('../../model/productModel');
-
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
 const cartModel = require('../../model/cartModel');
- 
+
 export default async function handler(req, res) {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Allow all methods
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, access-token'); // Allow specific headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, access-token');
+    
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -63,10 +62,10 @@ export default async function handler(req, res) {
             });
         }
 
-        // Create a new placed order
+        // Create a new placed order with full product objects
         const placedOrder = new placedOrderModel({
             user: userId,
-            products: cart.allProductsInCart, // Use the allProductsInCart from the cart
+            products: cart.allProductsInCart, // Store entire product objects
             address_id,
             contact_number,
         });
@@ -86,15 +85,10 @@ export default async function handler(req, res) {
             { $set: { allProductsInCart: [] } }
         );
 
-        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate({
-            path: 'products',
-        }).exec();
-        
-        
         return res.status(201).json({
             message: 'Order placed successfully',
             orderId: placedOrder._id,
-            ordersPlaced,
+            ordersPlaced: orderPlaced,
             isOrderPlacedSuccessfully: true,
         });
 
