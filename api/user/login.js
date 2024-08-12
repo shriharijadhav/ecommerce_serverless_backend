@@ -66,8 +66,8 @@ export default async function login(req, res) {
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
         const ordersPlaced = await placedOrderModel.findOne({ user: userId })
-            .populate('products')     // Ensure 'products' is the correct reference
-            .populate('address_id')   // Ensure 'address_id' is the correct reference
+            .populate('product')     // Ensure 'products' is the correct reference
+            .populate('address')   // Ensure 'address_id' is the correct reference
             .exec();
 
 
