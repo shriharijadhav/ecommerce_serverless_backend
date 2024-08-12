@@ -67,11 +67,7 @@ export default async function login(req, res) {
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
         // Manually populate the 'products' and 'address_id' fields
-        const order = await placedOrderModel.findOne({ user: userId }).exec();
-        const ordersPlaced = await placedOrderModel.populate(order, [
-            { path: 'products', model: 'product' },
-            { path: 'address_id', model: 'address' }
-        ]);
+        const ordersPlaced = await placedOrderModel.findOne({ user: userId })
 
 
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
