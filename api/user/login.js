@@ -1,12 +1,12 @@
-const addressModel = require('../../model/addressModel')
-const cartModel = require('../../model/cartModel');
+import addressModel from '../../model/addressModel';
+import cartModel from '../../model/cartModel';
 const placedOrderModel = require('../../model/placedOrderModel');
 
 const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
- 
+
 
 export default async function login(req, res) {
   
@@ -63,17 +63,14 @@ export default async function login(req, res) {
 
 
         // fetch all the data of user from multiple collections and send in response
-        // const userAddresses = await addressModel.find({ user: userFromDB._id})
-        // const userCart = await cartModel.findOne({ user: userFromDB._id})
-        // Manually populate the 'products' and 'address_id' fields
-        // const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id })
+        const userAddresses = await addressModel.find({ user: userFromDB._id})
+        const userCart = await cartModel.findOne({ user: userFromDB._id})
+        const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id})
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
-        
         const userData = {
             userProfileInfo,
             userAddresses,
-            userCart,
-            ordersPlaced,
+            userCart
         }
 
         return res.status(200).json({
@@ -87,7 +84,6 @@ export default async function login(req, res) {
     } catch (error) {
         return res.status(200).json({
             error: 'Failed to login ',
-            error
         });
     }
 }
