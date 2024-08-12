@@ -2,6 +2,7 @@ import checkIfUserIsLoggedIn from '../../middleware/auth';
 
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
+const cartModel = require('../../model/cartModel'); // Assuming you have a cart model defined
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -37,38 +38,54 @@ export default async function handler(req, res) {
         });
     }
 
-    const { products, address_id, contact_number } = req.body;
-
-    if (!products || products.length === 0 || !address_id || !contact_number) {
-        return res.status(400).json({
-            message: 'Products, address_id, and contact_number are required| Product array is required',
-        });
-    }
+    // Fetch userId from middleware (assuming it's set after authentication)
+    const userId = req.userId;
 
     try {
+        // Get allProductsInCart from the cart collection based on the user ID
+        const cart = await cartModel.findOne({ user: userId });
+
+        if (!cart || cart.allProductsInCart.length === 0) {
+            return res.status(400).json({
+                message: 'Your cart is empty. Please add items to your cart before placing an order.',
+                isOrderPlacedSuccessfully: false,
+            });
+        }
+
+        const { address_id, contact_number } = req.body;
+
+        if (!address_id || !contact_number) {
+            return res.status(400).json({
+                message: 'address_id and contact_number are required',
+                isOrderPlacedSuccessfully: false,
+            });
+        }
+
+        // Create a new placed order
         const placedOrder = new placedOrderModel({
-            user: req.userId,  // assuming userId is set in middleware after authentication
-            products,
+            user: userId,
+            products: cart.allProductsInCart, // Use the allProductsInCart from the cart
             address_id,
             contact_number,
         });
 
         const orderPlaced = await placedOrder.save();
 
-        if(!orderPlaced){
-            return res.status(201).json({
+        if (!orderPlaced) {
+            return res.status(500).json({
                 message: 'Failed to place order. Please try again',
-                isOrderPlacedSuccessfully: false,    
+                isOrderPlacedSuccessfully: false,
             });
         }
+
+        // Clear the cart after the order is placed
+        await cartModel.deleteOne({ user: userId });
 
         return res.status(201).json({
             message: 'Order placed successfully',
             orderId: placedOrder._id,
-            isOrderPlacedSuccessfully: true,    
-
+            isOrderPlacedSuccessfully: true,
         });
-                
 
     } catch (error) {
         return res.status(500).json({
