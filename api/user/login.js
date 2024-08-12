@@ -89,6 +89,7 @@ export default async function login(req, res) {
     } catch (error) {
         return res.status(200).json({
             error: 'Failed to login ',
+            error
         });
     }
 }
