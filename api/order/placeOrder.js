@@ -86,7 +86,10 @@ export default async function handler(req, res) {
             { $set: { allProductsInCart: [] } }
         );
 
-        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate('products').exec();
+        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate({
+            path: 'products',
+            model: productModel,
+        }).exec();
         
         return res.status(201).json({
             message: 'Order placed successfully',
