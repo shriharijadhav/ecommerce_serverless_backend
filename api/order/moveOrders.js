@@ -5,6 +5,7 @@ const deliveredOrdersModel = require('../../models/deliveredOrdersModel');
 const dbConnect = require('../../config/dbConnect');
 
 export default async function handler(req, res) {
+    console.log('executed');
     // Make db connection
     await dbConnect();
 
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    
     // Calculate the date 5 minutes ago from now
     const fiveMinutesAgo = new Date();
     fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
