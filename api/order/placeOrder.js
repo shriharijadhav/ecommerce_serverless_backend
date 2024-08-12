@@ -1,5 +1,4 @@
 import checkIfUserIsLoggedIn from '../../middleware/auth';
-const productModel = require('../../model/productModel');
 
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
@@ -50,8 +49,7 @@ export default async function handler(req, res) {
             return res.status(400).json({
                 message: 'Your cart is empty. Please add items to your cart before placing an order.',
                 isOrderPlacedSuccessfully: false,
-                userId,
-                cart
+                isCartEmpty: true,
             });
         }
 
@@ -87,10 +85,7 @@ export default async function handler(req, res) {
             { $set: { allProductsInCart: [] } }
         );
 
-        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate({
-            path: 'products',
-            model: 'product',
-        }).populate('address_id').exec();
+        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate('products').exec();
         
         return res.status(201).json({
             message: 'Order placed successfully',
