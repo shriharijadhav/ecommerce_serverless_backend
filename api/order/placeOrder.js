@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         return res.status(201).json({
             message: 'Order placed successfully',
             orderId: placedOrder._id,
-            ordersPlaced: orderPlaced,
+            placedOrderDetails: orderPlaced,
             isOrderPlacedSuccessfully: true,
         });
 
