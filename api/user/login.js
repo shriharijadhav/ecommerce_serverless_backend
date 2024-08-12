@@ -6,6 +6,7 @@ const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 
 export default async function login(req, res) {
@@ -65,7 +66,12 @@ export default async function login(req, res) {
         // fetch all the data of user from multiple collections and send in response
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
-        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate('product').exec();
+        // Manually populate the 'products' and 'address_id' fields
+        const order = await placedOrderModel.findOne({ user: userId }).exec();
+        const ordersPlaced = await placedOrderModel.populate(order, [
+            { path: 'products', model: 'product' },
+            { path: 'address_id', model: 'address' }
+        ]);
 
 
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
