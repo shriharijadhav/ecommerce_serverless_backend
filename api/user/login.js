@@ -65,18 +65,21 @@ export default async function login(req, res) {
         // fetch all the data of user from multiple collections and send in response
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
-        const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id})
+        const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id}).populate('products').exec()
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
+        
         const userData = {
             userProfileInfo,
             userAddresses,
-            userCart
+            userCart,
+            ordersPlaced
         }
 
         return res.status(200).json({
             message:'login successful',
             isLoginSuccessful:true,
             userData,
+            
             accessToken,
             refreshToken
         })
