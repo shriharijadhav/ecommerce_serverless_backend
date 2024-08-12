@@ -66,9 +66,7 @@ export default async function login(req, res) {
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
         const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id})
-        .populate({
-            path: 'product', // Populate the Product references
-        })
+        .populate('product')
         .populate('address') // Populate the Address reference
         .exec();
 
