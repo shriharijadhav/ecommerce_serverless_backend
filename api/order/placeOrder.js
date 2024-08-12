@@ -1,4 +1,5 @@
 import checkIfUserIsLoggedIn from '../../middleware/auth';
+const productModel = require('../../model/productModel');
 
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
