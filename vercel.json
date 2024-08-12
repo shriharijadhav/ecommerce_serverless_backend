@@ -1,6 +1,7 @@
 {
     "crons": [{
       "path": "/api/order/moveOrders",
-      "schedule": "*/15 * * * *"
+      "schedule": "*/5 * * * *"
     }]
   }
+  
