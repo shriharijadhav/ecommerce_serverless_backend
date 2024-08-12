@@ -1,4 +1,5 @@
 import checkIfUserIsLoggedIn from '../../middleware/auth';
+const productModel = require('../../model/productModel');
 
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
@@ -86,11 +87,15 @@ export default async function handler(req, res) {
             { $set: { allProductsInCart: [] } }
         );
 
-        // const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate('products').exec();
-
+        const ordersPlaced = await placedOrderModel.findOne({ user: userId }).populate({
+            path: 'products',
+            model: 'product',
+        }).populate('address_id').exec();
+        
         return res.status(201).json({
             message: 'Order placed successfully',
             orderId: placedOrder._id,
+            ordersPlaced,
             isOrderPlacedSuccessfully: true,
         });
 
