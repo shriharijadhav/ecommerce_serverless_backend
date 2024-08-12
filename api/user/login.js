@@ -1,5 +1,6 @@
 import addressModel from '../../model/addressModel';
 import cartModel from '../../model/cartModel';
+const placedOrderModel = require('../../model/placedOrderModel');
 
 const userModel = require('../../model/userModel')
 const dbConnect = require('../../config/dbConnect');
@@ -64,11 +65,13 @@ export default async function login(req, res) {
         // fetch all the data of user from multiple collections and send in response
         const userAddresses = await addressModel.find({ user: userFromDB._id})
         const userCart = await cartModel.findOne({ user: userFromDB._id})
+        const ordersPlaced = await placedOrderModel.findOne({ user: userFromDB._id})
         const userProfileInfo = {firstName:userFromDB.firstName, lastName:userFromDB.lastName,email:userFromDB.email,contact:userFromDB.contact,userId:userFromDB._id}
         const userData = {
             userProfileInfo,
             userAddresses,
-            userCart
+            userCart,
+            ordersPlaced,
         }
 
         return res.status(200).json({
