@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const cartSchema = mongoose.Schema({
     allProductsInCart:{
         type:Array,
-        defaultValue:[],
+        default:[],
     },
    
     user:{

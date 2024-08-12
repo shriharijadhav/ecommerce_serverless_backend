@@ -2,7 +2,7 @@ import checkIfUserIsLoggedIn from '../../middleware/auth';
 
 const dbConnect = require('../../config/dbConnect');
 const placedOrderModel = require('../../model/placedOrderModel');
-const cartModel = require('../../model/cartModel'); // Assuming you have a cart model defined
+const cartModel = require('../../model/cartModel');
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -78,8 +78,11 @@ export default async function handler(req, res) {
             });
         }
 
-        // Clear the cart after the order is placed
-        await cartModel.deleteOne({ user: userId });
+        // Clear the allProductsInCart array in the cart without deleting the cart document
+        await cartModel.updateOne(
+            { user: userId },
+            { $set: { allProductsInCart: [] } }
+        );
 
         return res.status(201).json({
             message: 'Order placed successfully',
