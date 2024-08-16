@@ -88,7 +88,6 @@ export default async function handler(req, res) {
         return res.status(201).json({
             message: 'Order placed successfully',
             orderId: placedOrder._id,
-            placedOrderDetails: orderPlaced,
             isOrderPlacedSuccessfully: true,
         });
 
@@ -96,6 +95,8 @@ export default async function handler(req, res) {
         return res.status(500).json({
             message: 'Something went wrong while placing the order',
             error: error.message,
+            isOrderPlacedSuccessfully: false,
+
         });
     }
 }
