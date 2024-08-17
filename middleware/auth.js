@@ -65,7 +65,7 @@ async function checkIfUserIsLoggedIn(req, accessToken, refreshToken) {
 
                 // Re-generate new access token
                 const payload = { userId: decodedRefreshToken.userId };
-                const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' });
+                const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
                 req.newAccessToken = newAccessToken;
 
                 return true; // Refresh token is valid
